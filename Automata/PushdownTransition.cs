@@ -10,28 +10,11 @@ namespace Automata
         public readonly Symbol stackSym;
         public readonly Symbol[] stackReplacement;
 
-        /// <summary>
-        /// Whether the transition doesn't require reading a symbol from the main tape
-        /// </summary>
-        public readonly bool dontReadMainTape;
-
-        public PushdownTransition(int startState, int endState, Symbol sym, Symbol stackSym, Symbol[] stackReplacement) : base(startState, endState, sym)
+        public PushdownTransition(int startState, int endState, OptSymbol<Symbol> sym, Symbol stackSym, Symbol[] stackReplacement) : base(startState, endState, sym)
         {
 
             this.stackSym = stackSym;
             this.stackReplacement = stackReplacement;
-            dontReadMainTape = false;
-
-        }
-
-        public PushdownTransition(int startState, int endState, Symbol stackSym, Symbol[] stackReplacement) : base(startState, endState, default)
-        {
-
-            // This constructor is for transitions not requiring reading the main tape
-
-            this.stackSym = stackSym;
-            this.stackReplacement = stackReplacement;
-            dontReadMainTape = true;
 
         }
 

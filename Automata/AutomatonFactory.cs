@@ -17,7 +17,7 @@ namespace Automata
             foreach (Transition<Symbol> t in transitions)
             {
 
-                if (!alphabetM.Contains(t.sym))
+                if (t.sym.Exists && !alphabetM.Contains(t.sym))
                     alphabetM.Add(t.sym);
 
                 if (t.startState > maximumState)
@@ -32,7 +32,7 @@ namespace Automata
 
         }
 
-        public static DeterministicFiniteAutomaton<Symbol> GenerateDFM<Symbol>(FiniteTransition<Symbol>[] transitions,
+        public static DeterministicFiniteAutomaton<Symbol> GenerateDFA<Symbol>(FiniteTransition<Symbol>[] transitions,
             ImmutableHashSet<int> acceptingStates)
             where Symbol : IEquatable<Symbol>
         {

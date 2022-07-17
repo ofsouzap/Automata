@@ -4,7 +4,7 @@
     public class DPATests0
     {
 
-        private DeterministicPushdownAutomaton<char> dpa;
+        private readonly DeterministicPushdownAutomaton<char> dpa;
 
         public DPATests0()
         {
@@ -15,9 +15,9 @@
                     new(0, 0, 'a', 'Z', new char[] { 'Z', 'X' }),
                     new(0, 0, 'a', 'X', new char[] { 'X', 'X' }),
                     new(0, 1, 'b', 'X', Array.Empty<char>()),
-                    new(1, 2, 'X', Array.Empty<char>()),
+                    new(1, 2, OptSymbol<char>.None, 'X', Array.Empty<char>()),
                     new(2, 1, 'b', 'X', Array.Empty<char>()),
-                    new(2, 3, 'Z', new char[] { 'Z' })
+                    new(2, 3, OptSymbol<char>.None, 'Z', new char[] { 'Z' })
                 },
                 stackBottomSymbol: 'Z',
                 acceptingStates: ImmutableHashSet.Create(3)

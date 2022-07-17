@@ -4,7 +4,7 @@
     public class NFATests0
     {
 
-        private NonDeterministicFiniteAutomaton<int> nfa;
+        private readonly NonDeterministicFiniteAutomaton<int> nfa;
 
         public NFATests0()
         {

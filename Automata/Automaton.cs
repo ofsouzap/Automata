@@ -54,7 +54,7 @@ namespace Automata
             => transitions.All(t => CheckTransitionUsesAlphabet(t));
 
         protected bool CheckTransitionUsesAlphabet(Transition t)
-            => alphabet.Contains(t.sym);
+            => !t.sym.Exists || alphabet.Contains(t.sym);
 
         protected bool CheckTransitionsInStateRange()
             => transitions.All(t => CheckTransitionInStateRange(t));

@@ -20,12 +20,12 @@ namespace Automata
         protected override bool CheckTransitionsAreDeterministic()
         {
 
-            HashSet<(int, Symbol)> stateSymPairsUsed = new();
+            HashSet<(int, Symbol?)> stateSymPairsUsed = new();
 
             foreach (FiniteTransition<Symbol> t in transitions)
             {
 
-                (int, Symbol) stateSymPair = (t.startState, t.sym);
+                (int, Symbol?) stateSymPair = (t.startState, t.sym);
 
                 if (stateSymPairsUsed.Contains(stateSymPair))
                     return false;
@@ -38,8 +38,11 @@ namespace Automata
 
         }
 
-        protected FiniteTransition<Symbol>? FindTransition(int startState, Symbol sym)
-            => GetTransitionsFromState(startState).FirstOrDefault(t => t.sym.Equals(sym));
+        protected FiniteTransition<Symbol>? FindInstantTransition(int startState)
+            => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && !t.sym.Exists, null);
+
+        protected FiniteTransition<Symbol>? FindReadTransition(int startState, Symbol sym)
+            => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && t.sym.Exists && t.sym.Equals(sym), null);
 
         public override bool Run(Symbol[] word)
         {
@@ -50,15 +53,34 @@ namespace Automata
             while (symQueue.Count > 0)
             {
 
+                #region Instant Transitions
+
+                FiniteTransition<Symbol>? insT = FindInstantTransition(currentState);
+
+                if (insT != null)
+                {
+                    currentState = insT.endState;
+                    continue;
+                }
+
+                #endregion
+
+                #region Read Transitions
+
                 Symbol sym = symQueue.Dequeue();
 
-                FiniteTransition<Symbol>? t = FindTransition(currentState, sym);
+                FiniteTransition<Symbol>? t = FindReadTransition(currentState, sym);
 
-                // If no transitions found, it is assumed that the word should be rejected
-                if (t == null)
-                    return false;
+                if (t != null)
+                {
+                    currentState = t.endState;
+                    continue;
+                }
 
-                currentState = t.endState;
+                #endregion
+
+                // If no transitions were found, the word is rejected
+                return false;
 
             }
 

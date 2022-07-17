@@ -23,24 +23,15 @@ namespace Automata
         {
 
             // Tuple is (startState, mainTapeSymbolIsUsed, mainTapeSymbolRead, stackSymbolRead)
-            HashSet<(int, bool, Symbol, Symbol)> transitionCombsUsed = new();
+            HashSet<(int, OptSymbol<Symbol>, Symbol)> transitionCombsUsed = new();
 
             foreach (PushdownTransition<Symbol> t in transitions)
             {
 
-                (int, bool, Symbol, Symbol) comb = (t.startState, !t.dontReadMainTape, t.sym, t.stackSym);
+                (int, OptSymbol<Symbol>, Symbol) comb = (t.startState, t.sym, t.stackSym);
                 
-                if (transitionCombsUsed.Any(x =>
-                    x.Item1 == comb.Item1 // Check start states match
-                    && (
-                        !x.Item2 && !comb.Item2 // Check both don't read main tape symbol...
-                        || (x.Item2 && comb.Item2 && x.Item3.Equals(comb.Item3)) // ...or both read the same main tape symbol
-                    )
-                    && x.Item4.Equals(comb.Item4) // Check stack symbols read match
-                ))
-                {
+                if (transitionCombsUsed.Contains(comb))
                     return false;
-                }
 
                 transitionCombsUsed.Add(comb);
 
@@ -50,11 +41,11 @@ namespace Automata
 
         }
 
-        protected PushdownTransition<Symbol>? FindReadTransition(int startState, Symbol sym, Symbol stackSym)
-            => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && !t.dontReadMainTape && t.sym.Equals(sym) && t.stackSym.Equals(stackSym), null);
-
         protected PushdownTransition<Symbol>? FindInstantTransition(int startState, Symbol stackSym)
-            => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && t.dontReadMainTape && t.stackSym.Equals(stackSym), null);
+            => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && !t.sym.Exists && t.stackSym.Equals(stackSym), null);
+
+        protected PushdownTransition<Symbol>? FindReadTransition(int startState, Symbol sym, Symbol stackSym)
+            => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && t.sym.Exists && t.sym.Equals(sym) && t.stackSym.Equals(stackSym), null);
 
         public override bool Run(Symbol[] word)
         {
@@ -84,7 +75,6 @@ namespace Automata
                     // Change state
                     currentState = insT.endState;
 
-                    // Restart loop
                     continue;
 
                 }
@@ -100,17 +90,24 @@ namespace Automata
 
                 PushdownTransition<Symbol>? readT = FindReadTransition(currentState, symQueue.Dequeue(), stackSym);
 
-                if (readT == null)
-                    return false;
+                if (readT != null)
+                {
 
-                // Write transition word
-                foreach (Symbol s in readT.stackReplacement)
-                    stack.Push(s);
+                    // Write transition word
+                    foreach (Symbol s in readT.stackReplacement)
+                        stack.Push(s);
 
-                // Change state
-                currentState = readT.endState;
+                    // Change state
+                    currentState = readT.endState;
+
+                    continue;
+
+                }
 
                 #endregion
+
+                // If no transitions were found, the word is rejected
+                return false;
 
             }
 

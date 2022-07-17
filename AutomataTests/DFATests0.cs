@@ -4,12 +4,12 @@ namespace AutomataTests
     public class DFATests0
     {
 
-        private DeterministicFiniteAutomaton<int> dfa;
+        private readonly DeterministicFiniteAutomaton<int> dfa;
 
         public DFATests0()
         {
 
-            dfa = AutomatonFactory.GenerateDFM(
+            dfa = AutomatonFactory.GenerateDFA(
                 transitions: new FiniteTransition<int>[]
                 {
                     new(0, 1, 0),

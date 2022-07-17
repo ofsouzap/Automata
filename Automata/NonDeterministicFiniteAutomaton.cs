@@ -16,36 +16,73 @@ namespace Automata
 
         }
 
-        protected FiniteTransition<Symbol>[] FindTransitions(int startState, Symbol sym)
-            => GetTransitionsFromState(startState).Where(t => t.sym.Equals(sym)).ToArray();
+        protected FiniteTransition<Symbol>[] FindInstantTransitions(int startState)
+            => GetTransitionsFromState(startState).Where(t => !t.sym.Exists).ToArray();
+
+        protected FiniteTransition<Symbol>[] FindReadTransitions(int startState, Symbol sym)
+            => GetTransitionsFromState(startState).Where(t => t.sym.Exists && t.sym.Equals(sym)).ToArray();
 
         public override bool Run(Symbol[] word)
         {
 
-            List<int> currentStates = new() { 0 };
+            HashSet<int> currentStates = new() { 0 };
 
             Queue<Symbol> symQueue = new(word);
 
-            while (symQueue.Count > 0)
+            while (true)
             {
 
-                Symbol sym = symQueue.Dequeue();
+                #region Instant Transitions
 
-                List<int> nextStates = new();
+                HashSet<int> nextInstantStates = new();
 
                 foreach (int state in currentStates)
                 {
 
-                    FiniteTransition<Symbol>[] ts = FindTransitions(state, sym);
-                    nextStates.AddRange(ts.Select(t => t.endState));
+                    nextInstantStates.Add(state);
+
+                    FiniteTransition<Symbol>[] ts = FindInstantTransitions(state);
+
+                    foreach (int s in ts.Select(t => t.endState))
+                        nextInstantStates.Add(s);
 
                 }
 
-                if (nextStates.Count == 0)
+                // Don't proceed to read transitions in this loop if possible states was changed so that more instant transitions can be done if needed before looking at read transitions
+                if (!currentStates.SetEquals(nextInstantStates))
+                {
+                    currentStates = nextInstantStates;
+                    continue;
+                }
+
+                #endregion
+
+                if (symQueue.Count == 0)
+                    break;
+
+                #region Read Transitions
+
+                HashSet<int> nextReadStates = new();
+
+                Symbol sym = symQueue.Dequeue();
+
+                foreach (int state in currentStates)
+                {
+
+                    FiniteTransition<Symbol>[] ts = FindReadTransitions(state, sym);
+
+                    foreach (int s in ts.Select(t => t.endState))
+                        nextReadStates.Add(s);
+
+                }
+
+                if (nextReadStates.Count == 0)
                     return false;
 
-                currentStates = nextStates;
-                
+                currentStates = nextReadStates;
+
+                #endregion
+
             }
 
             return currentStates.Any(s => acceptingStates.Contains(s));
