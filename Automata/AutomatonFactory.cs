@@ -88,5 +88,25 @@ namespace Automata
 
         }
 
+        public static DeterministicTuringAutomaton<Symbol> GenerateDTA<Symbol>(TuringTransition<Symbol>[] transitions,
+            ImmutableHashSet<int> acceptingStates,
+            Symbol blankSymbol)
+            where Symbol : IEquatable<Symbol>
+        {
+
+            FindAutomatonDetailsFromTransitions(transitions,
+                out ImmutableHashSet<Symbol> alphabet,
+                out int maximumState);
+
+            return new(
+                alphabet: alphabet,
+                stateCount: maximumState + 1,
+                acceptingStates: acceptingStates,
+                transitions: transitions,
+                blankSymbol: blankSymbol
+            );
+
+        }
+
     }
 }

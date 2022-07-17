@@ -36,7 +36,7 @@
         [TestMethod]
         public void Test0()
         {
-            Assert.IsTrue(nfa.Run(new char[] {  }));
+            Assert.IsTrue(nfa.Run(Array.Empty<char>()));
         }
 
         [TestMethod]

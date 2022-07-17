@@ -22,7 +22,7 @@ namespace Automata
         protected override bool CheckTransitionsAreDeterministic()
         {
 
-            // Tuple is (startState, mainTapeSymbolIsUsed, mainTapeSymbolRead, stackSymbolRead)
+            // Tuple is (startState, mainTapeSymbolRead, stackSymbolRead)
             HashSet<(int, OptSymbol<Symbol>, Symbol)> transitionCombsUsed = new();
 
             foreach (PushdownTransition<Symbol> t in transitions)
