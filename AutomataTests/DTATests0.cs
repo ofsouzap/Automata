@@ -28,37 +28,43 @@
         [TestMethod]
         public void Test0()
         {
-            Assert.IsFalse(dta.Run(Array.Empty<int>()));
+            Assert.IsFalse(dta.Run(Array.Empty<int>(), out var t));
+            Assert.IsTrue(t.CompareToArray(Array.Empty<int>()));
         }
 
         [TestMethod]
         public void Test1()
         {
-            Assert.IsTrue(dta.Run(new int[] { 0, 1, 0 }));
+            Assert.IsTrue(dta.Run(new int[] { 0, 1, 0 }, out var t));
+            Assert.IsTrue(t.CompareToArray(new int[] { 1, 1, 1 }));
         }
 
         [TestMethod]
         public void Test2()
         {
-            Assert.IsFalse(dta.Run(new int[] { 0, 1, 1 }));
+            Assert.IsFalse(dta.Run(new int[] { 0, 1, 1 }, out var t));
+            Assert.IsTrue(t.CompareToArray(new int[] { 1, 0, 0 }));
         }
 
         [TestMethod]
         public void Test3()
         {
-            Assert.IsTrue(dta.Run(new int[] { 1, 0, 0, 0 }));
+            Assert.IsTrue(dta.Run(new int[] { 1, 0, 0, 0 }, out var t));
+            Assert.IsTrue(t.CompareToArray(new int[] { 0, 1, 1, 1 }));
         }
 
         [TestMethod]
         public void Test4()
         {
-            Assert.IsFalse(dta.Run(new int[] { 1, 0, 0, 1 }));
+            Assert.IsFalse(dta.Run(new int[] { 1, 0, 0, 1 }, out var t));
+            Assert.IsTrue(t.CompareToArray(new int[] { 0, 1, 0, 0 }));
         }
 
         [TestMethod]
         public void Test5()
         {
-            Assert.IsTrue(dta.Run(new int[] { 0, 0, 1, 1, 0, 0, 1, 1, 1 }));
+            Assert.IsTrue(dta.Run(new int[] { 0, 0, 1, 1, 0, 0, 1, 1, 1, 0 }, out var t));
+            Assert.IsTrue(t.CompareToArray(new int[] { 1, 1, 1, 0, 1, 0, 1, 1, 1, 0 }));
         }
 
     }

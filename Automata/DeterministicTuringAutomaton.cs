@@ -19,11 +19,22 @@ namespace Automata
             this.blankSymbol = blankSymbol;
         }
 
-        protected class Tape
+        public class Tape
         {
 
             private readonly Symbol blankSymbol;
             private readonly Dictionary<int, Symbol> values;
+
+            private IEnumerable<int> NonBlankValueKeys
+                => values
+                .Where(p => !p.Value.Equals(blankSymbol))
+                .Select(p => p.Key);
+
+            protected int NonBlankStartIndex
+                => NonBlankValueKeys.Min();
+
+            protected int NonBlankEndIndex
+                => NonBlankValueKeys.Max();
 
             public Tape(Symbol blankSymbol)
             {
@@ -59,6 +70,35 @@ namespace Automata
                     values.Add(index, value);
             }
 
+            /// <summary>
+            /// Reads the tape from the first non-blank symbol to the last non-blank symbol
+            /// </summary>
+            public IEnumerable<Symbol> Read()
+            {
+
+                if (NonBlankValueKeys.Count() == 0)
+                    yield break;
+
+                int end = NonBlankEndIndex; // Caching for efficiency
+                for (int i = NonBlankStartIndex; i <= end; i++)
+                    yield return this[i];
+
+            }
+
+            public bool CompareToArray(Symbol[] a)
+            {
+
+                int i = 0;
+
+                foreach (Symbol s in Read())
+                    if (!a[i++].Equals(s))
+                        return false;
+
+                // Still can be false if len(a) > len(tapeUsed)
+                return i == a.Length;
+
+            }
+
         }
 
         protected override bool CheckTransitionsAreDeterministic()
@@ -88,13 +128,13 @@ namespace Automata
         protected TuringTransition<Symbol>? FindReadTransition(int startState, Symbol sym)
             => GetTransitionsFromState(startState).FirstOrDefault(t => t != null && t.sym.Exists && t.sym.Equals(sym), null);
 
-        public override bool Run(Symbol[] word)
+        public bool Run(Symbol[] word, out Tape tape)
         {
 
             int currentState = 0;
 
             int headPosition = 0;
-            Tape tape = new(blankSymbol, word);
+            tape = new(blankSymbol, word);
 
             while (true)
             {
@@ -158,6 +198,9 @@ namespace Automata
             return acceptingStates.Contains(currentState);
 
         }
+
+        public override bool Run(Symbol[] word)
+            => Run(word, out _);
 
     }
 }
