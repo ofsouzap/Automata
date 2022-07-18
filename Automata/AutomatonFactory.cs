@@ -50,6 +50,31 @@ namespace Automata
 
         }
 
+        public static DeterministicFiniteAutomaton<string> GenerateDFA(string transitionsString,
+            ImmutableHashSet<int> acceptingStates)
+        {
+
+            string[] tStrings = transitionsString.Split(';');
+
+            FiniteTransition<string>[] transitions = new FiniteTransition<string>[tStrings.Length];
+
+            for (int i = 0; i < tStrings.Length; i++)
+            {
+
+                string tString = tStrings[i];
+
+                if (Parsing.TryParseFiniteTransition(tString, out FiniteTransition<string>? t) && t != null)
+                    transitions[i] = t;
+                else
+                    throw new ArgumentException("Invalid transition provided");
+
+
+            }
+
+            return GenerateDFA(transitions, acceptingStates);
+
+        }
+
         public static DeterministicPushdownAutomaton<Symbol> GenerateDPA<Symbol>(PushdownTransition<Symbol>[] transitions,
             Symbol stackBottomSymbol,
             ImmutableHashSet<int> acceptingStates)
@@ -67,6 +92,32 @@ namespace Automata
                 transitions: transitions,
                 stackBottomSymbol: stackBottomSymbol
             );
+
+        }
+
+        public static DeterministicPushdownAutomaton<string> GenerateDPA(string transitionsString,
+            string stackBottomSymbol,
+            ImmutableHashSet<int> acceptingStates)
+        {
+
+            string[] tStrings = transitionsString.Split(';');
+
+            PushdownTransition<string>[] transitions = new PushdownTransition<string>[tStrings.Length];
+
+            for (int i = 0; i < tStrings.Length; i++)
+            {
+
+                string tString = tStrings[i];
+
+                if (Parsing.TryParsePushdownTransition(tString, out PushdownTransition<string>? t) && t != null)
+                    transitions[i] = t;
+                else
+                    throw new ArgumentException("Invalid transition provided");
+
+
+            }
+
+            return GenerateDPA(transitions, stackBottomSymbol, acceptingStates);
 
         }
 
@@ -88,6 +139,31 @@ namespace Automata
 
         }
 
+        public static NonDeterministicFiniteAutomaton<string> GenerateNFA(string transitionsString,
+            ImmutableHashSet<int> acceptingStates)
+        {
+
+            string[] tStrings = transitionsString.Split(';');
+
+            FiniteTransition<string>[] transitions = new FiniteTransition<string>[tStrings.Length];
+
+            for (int i = 0; i < tStrings.Length; i++)
+            {
+
+                string tString = tStrings[i];
+
+                if (Parsing.TryParseFiniteTransition(tString, out FiniteTransition<string>? t) && t != null)
+                    transitions[i] = t;
+                else
+                    throw new ArgumentException("Invalid transition provided");
+
+
+            }
+
+            return GenerateNFA(transitions, acceptingStates);
+
+        }
+
         public static DeterministicTuringAutomaton<Symbol> GenerateDTA<Symbol>(TuringTransition<Symbol>[] transitions,
             ImmutableHashSet<int> acceptingStates,
             Symbol blankSymbol)
@@ -105,6 +181,32 @@ namespace Automata
                 transitions: transitions,
                 blankSymbol: blankSymbol
             );
+
+        }
+
+        public static DeterministicTuringAutomaton<string> GenerateDTA(string transitionsString,
+            ImmutableHashSet<int> acceptingStates,
+            string blankSymbol)
+        {
+
+            string[] tStrings = transitionsString.Split(';');
+
+            TuringTransition<string>[] transitions = new TuringTransition<string>[tStrings.Length];
+
+            for (int i = 0; i < tStrings.Length; i++)
+            {
+
+                string tString = tStrings[i];
+
+                if (Parsing.TryParseTuringTransition(tString, out TuringTransition<string>? t) && t != null)
+                    transitions[i] = t;
+                else
+                    throw new ArgumentException("Invalid transition provided");
+
+
+            }
+
+            return GenerateDTA(transitions, acceptingStates, blankSymbol);
 
         }
 
